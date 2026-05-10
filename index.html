@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para sa mga tanang Mama | Maligayang Araw ng mga Ina</title>
+    
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- GSAP Core & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --color-bg: #fef8f3;
+            --color-gold: #ff9f43;
+            --color-gold-light: #ffb366;
+            --color-rose-deep: #e85d3f;
+            --color-rose-mid: #ff8c42;
+            --color-rose-light: #ffe8d6;
+            --color-accent: #f9945d;
+            --color-cream: #fff4e6;
+            --color-coral: #ff6b5a;
+            --color-amber: #f39c12;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Manrope', sans-serif;
+            --shadow-sm: 0 2px 8px rgba(232, 93, 63, 0.08);
+            --shadow-md: 0 8px 24px rgba(232, 93, 63, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-rose-deep);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-rendering: optimizeLegibility;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* --- HIGH-END TEXTURE --- */
+        .grain {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 107, 90, 0.4) 0%, rgba(249, 148, 93, 0.2) 40%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -150%);
+            transition: transform 0.1s ease-out;
+            filter: blur(50px);
+        }
+
+        /* --- DYNAMIC BACKGROUND --- */
+        .mesh-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: var(--color-bg);
+        }
+
+        .orb {
+            position: absolute;
+            filter: blur(120px);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .orb-1 { width: 600px; height: 600px; background: linear-gradient(135deg, var(--color-rose-light) 0%, rgba(255, 140, 66, 0.5) 100%); top: -10%; left: -10%; }
+        .orb-2 { width: 700px; height: 700px; background: linear-gradient(135deg, #ffe8cc 0%, rgba(255, 155, 67, 0.4) 100%); bottom: -10%; right: -10%; }
+
+        /* --- CONTENT LAYOUT --- */
+        .container { position: relative; z-index: 2; }
+
+        section {
+            min-height: 120vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 10%;
+            position: relative;
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* The Agency-Style Reveal Class */
+        .reveal-text {
+            opacity: 0;
+            filter: blur(15px);
+            transform: translateY(50px);
+            will-change: transform, opacity, filter;
+        }
+
+        .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: var(--color-gold);
+            margin-bottom: 2rem;
+            display: block;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(212, 175, 55, 0.1);
+        }
+
+        .headline {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            line-height: 1.15;
+            margin-bottom: 2.5rem;
+            color: var(--color-rose-deep);
+            font-weight: 700;
+            text-shadow: 0 4px 12px rgba(158, 90, 99, 0.1);
+            letter-spacing: -0.5px;
+        }
+
+        .headline span {
+            display: block;
+            font-style: italic;
+            color: var(--color-accent);
+            font-weight: 400;
+        }
+
+        .description {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-weight: 300;
+            line-height: 1.9;
+            max-width: 550px;
+            opacity: 0.85;
+            letter-spacing: 0.3px;
+        }
+
+        .align-right { text-align: right; margin-left: auto; }
+        .align-left { text-align: left; }
+
+        /* --- FLORAL ASSETS --- */
+        .flower-asset {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.7;
+            pointer-events: none;
+            fill: var(--color-rose-mid);
+            filter: drop-shadow(0 8px 20px rgba(158, 90, 99, 0.08));
+            transition: filter 0.3s ease;
+        }
+
+        #scene-4 { text-align: center; }
+        .final-title {
+            font-family: var(--font-serif);
+            font-size: clamp(3.5rem, 15vw, 8rem);
+            color: var(--color-rose-deep);
+            line-height: 1;
+            font-weight: 700;
+            text-shadow: 0 6px 20px rgba(158, 90, 99, 0.15);
+            letter-spacing: -1px;
+        }
+        .final-title span { color: var(--color-gold-light); font-style: italic; }
+
+        .signature {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 2rem;
+            color: var(--color-rose-mid);
+            margin-top: 4rem;
+            text-shadow: 0 2px 8px rgba(158, 90, 99, 0.1);
+            letter-spacing: 0.5px;
+        }
+
+        /* --- SPLASH --- */
+        #splash {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-agency {
+            background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-rose-light) 100%);
+            border: 2px solid var(--color-rose-deep);
+            padding: 1.4rem 4rem;
+            font-family: var(--font-sans);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 0.75rem;
+            color: var(--color-rose-deep);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(232, 93, 63, 0.2);
+        }
+
+        .btn-agency:hover {
+            background: linear-gradient(135deg, var(--color-rose-deep) 0%, var(--color-accent) 100%);
+            color: white;
+            letter-spacing: 7px;
+            box-shadow: 0 12px 40px rgba(232, 93, 63, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-agency:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 20px rgba(232, 93, 63, 0.25);
+        }
+
+        /* --- ENHANCED REVEAL TEXT --- */
+        .reveal-text {
+            opacity: 0;
+            filter: blur(20px);
+            transform: translateY(60px);
+            will-change: transform, opacity, filter;
+        }
+
+        /* --- RESPONSIVE ENHANCEMENTS --- */
+        @media (max-width: 768px) {
+            section {
+                padding: 3rem 5%;
+            }
+            
+            .headline {
+                text-shadow: 0 2px 8px rgba(232, 93, 63, 0.08);
+            }
+
+            .btn-agency {
+                padding: 1.2rem 3rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* --- SECTION DIVIDERS --- */
+        .divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
+            margin: 2rem auto;
+            opacity: 0;
+            filter: blur(2px);
+            will-change: opacity;
+        }
+
+        /* --- SCROLL PROGRESS BAR --- */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-coral) 0%, var(--color-gold) 50%, var(--color-amber) 100%);
+            width: 0%;
+            z-index: 998;
+            box-shadow: 0 2px 12px rgba(255, 107, 90, 0.4);
+        }
+
+        /* --- FLOATING ELEMENTS --- */
+        .float-element {
+            position: absolute;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        .float-1 { width: 60px; height: 60px; background: rgba(255, 159, 67, 0.1); border-radius: 50%; }
+        .float-2 { width: 40px; height: 40px; background: rgba(255, 107, 90, 0.08); border-radius: 50%; }
+        .float-3 { width: 80px; height: 80px; background: rgba(243, 156, 18, 0.06); border-radius: 50%; }
+
+        /* --- ENHANCED INTERACTIVE HOVER --- */
+        .headline {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        section:hover .headline {
+            color: var(--color-coral);
+            filter: drop-shadow(0 8px 20px rgba(255, 107, 90, 0.2));
+        }
+
+        .description {
+            transition: all 0.4s ease;
+        }
+
+        section:hover .description {
+            opacity: 1;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- SPLASH ENHANCEMENTS --- */
+        .splash-decoration {
+            position: absolute;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .splash-decoration-1 {
+            width: 200px;
+            height: 200px;
+            border: 2px solid var(--color-gold);
+            border-radius: 50%;
+            top: 5%;
+            left: 5%;
+            animation: rotate-slow 15s infinite linear;
+        }
+
+        .splash-decoration-2 {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed var(--color-accent);
+            border-radius: 50%;
+            bottom: 10%;
+            right: 5%;
+            animation: rotate-slow-reverse 20s infinite linear;
+        }
+
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotate-slow-reverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 90, 0.7); }
+            50% { box-shadow: 0 0 0 20px rgba(255, 107, 90, 0); }
+        }
+
+        .pulse {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+    <div class="grain"></div>
+    <div class="cursor-glow" id="glow"></div>
+    
+    <div class="mesh-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div id="splash">
+        <div class="splash-decoration splash-decoration-1"></div>
+        <div class="splash-decoration splash-decoration-2"></div>
+        <div style="font-family: var(--font-serif); font-style: italic; font-size: 1.8rem; color: var(--color-rose-deep); margin-bottom: 1.5rem; text-shadow: 0 4px 12px rgba(232, 93, 63, 0.2); letter-spacing: 1px; position: relative; z-index: 10;">✨ Kining adlawa alang kaninyo! ✨</div>
+        <p style="font-size: 1.1rem; color: var(--color-rose-mid); margin-bottom: 3rem; opacity: 0.9; position: relative; z-index: 10;">Ang espesyal na pang-araw para sa mga inang puno ng pagmamahal</p>
+        <button class="btn-agency" onclick="start()" style="position: relative; z-index: 10; box-shadow: 0 12px 40px rgba(255, 107, 90, 0.3);">Pislita kini Palihog</button>
+    </div>
+
+    <div class="container">
+        <section id="s1">
+            <div class="content-wrapper align-left">
+                <div class="reveal-text">
+                    <span class="label">Chapter I</span>
+                    <h1 class="headline">Ang mga babaye nga <span>nahimong among unang panimalay.</span></h1>
+                    <p class="description">Ug ang gugma nga nagtudlo kanamo sa pagpauli, bisan unsa pa mi kalayo nga napadpad.</p>
+                </div>
+            </div>
+            <svg class="flower-asset" style="top: 10%; right: 5%; width: 300px;" viewBox="0 0 200 200">
+                <!-- Enhanced floral design with multiple layers -->
+                <defs>
+                    <filter id="glow-1">
+                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <!-- Center circle -->
+                <circle cx="100" cy="100" r="15" fill="var(--color-gold)" opacity="0.8" filter="url(#glow-1)"/>
+                <!-- Petals -->
+                <ellipse cx="100" cy="40" rx="20" ry="35" fill="currentColor" opacity="0.7"/>
+                <ellipse cx="145" cy="55" rx="20" ry="35" fill="currentColor" opacity="0.6" transform="rotate(72 100 100)"/>
+                <ellipse cx="140" cy="145" rx="20" ry="35" fill="currentColor" opacity="0.65" transform="rotate(144 100 100)"/>
+                <ellipse cx="60" cy="150" rx="20" ry="35" fill="currentColor" opacity="0.7" transform="rotate(216 100 100)"/>
+                <ellipse cx="55" cy="55" rx="20" ry="35" fill="currentColor" opacity="0.6" transform="rotate(288 100 100)"/>
+            </svg>
+        </section>
+
+        <section id="s2">
+            <div class="content-wrapper align-right">
+                <div class="reveal-text">
+                    <span class="label">Chapter II</span>
+                    <h1 class="headline">Hilom nga mga pag-ampo <span>ug tago nga kalig-on.</span></h1>
+                    <p class="description">Nasayod kami nga gipas-an ninyo ang tanang kalisod. Gibuhat ninyo kini sa hilom nga paagi, hangtod nga wala gyud namo nabati ang kabug-at.</p>
+                </div>
+            </div>
+            <svg class="flower-asset" style="bottom: 5%; left: 5%; width: 400px;" viewBox="0 0 200 200">
+                <!-- Decorative vine pattern -->
+                <defs>
+                    <filter id="glow-2">
+                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <!-- Main vine curve -->
+                <path d="M10,100 Q50,50 100,40 T190,100" fill="none" stroke="currentColor" stroke-width="2" opacity="0.6"/>
+                <!-- Leaf shapes along vine -->
+                <ellipse cx="40" cy="70" rx="12" ry="8" fill="currentColor" opacity="0.5" transform="rotate(-30 40 70)"/>
+                <ellipse cx="90" cy="35" rx="12" ry="8" fill="currentColor" opacity="0.6" transform="rotate(45 90 35)"/>
+                <ellipse cx="150" cy="50" rx="12" ry="8" fill="currentColor" opacity="0.5" transform="rotate(60 150 50)"/>
+                <!-- Flower clusters -->
+                <circle cx="60" cy="85" r="4" fill="var(--color-gold)" opacity="0.7" filter="url(#glow-2)"/>
+                <circle cx="50" cy="95" r="3" fill="currentColor" opacity="0.6"/>
+                <circle cx="70" cy="95" r="3" fill="currentColor" opacity="0.6"/>
+            </svg>
+        </section>
+
+        <section id="s3">
+            <div class="content-wrapper align-left">
+                <div class="reveal-text">
+                    <span class="label">Chapter III</span>
+                    <h1 class="headline">Ang katahum sa <span>gugmang walay kondisyon.</span></h1>
+                    <p class="description">Gitudloan kami ninyo nga ang tinuod nga kalig-on wala sa kasaba. <br><br>
+                    <span style="color: var(--color-gold); font-style: italic;">"Ang inyong walay puas nga pag-atiman, ang inyong walay katapusang pagsabut ug ang inyong walay sukod nga pagpangga ug pagmahal."</span><br><br>
+                    Kini ang naghimo kanamo kon kinsa mi karon.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="s4">
+            <div class="content-wrapper">
+                <div class="reveal-text">
+                    <span class="label">Hinaut unta nga kamo magmalipayon niining adlawa!</span>
+                    <h1 class="final-title">Happy <span>Mother's</span> Day to all Mothers out there!</h1>
+                    <div class="signature">Sa among gugma, sa kanunay.<br><strong>From: Surigao Gaw</strong></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Register GSAP Plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        function start() {
+            const tl = gsap.timeline();
+            tl.to("#splash", { 
+                opacity: 0, 
+                duration: 1, 
+                ease: "power4.inOut",
+                onComplete: () => {
+                    document.getElementById('splash').style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Cursor Glow Effect - Enhanced
+        window.addEventListener('mousemove', (e) => {
+            gsap.to("#glow", {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+        });
+
+        // Touch support for mobile glow
+        window.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            gsap.to("#glow", {
+                x: touch.clientX,
+                y: touch.clientY,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+        });
+
+        // Agency-Level Scroll Orchestration
+        document.querySelectorAll('section').forEach((section) => {
+            const text = section.querySelector('.reveal-text');
+            const flower = section.querySelector('.flower-asset');
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                    end: "top 20%",
+                    scrub: 1, // This ties the animation to the scroll progress
+                }
+            });
+
+            // Text sequence: Blur -> Move Up -> Opacity - Enhanced
+            tl.fromTo(text, 
+                { opacity: 0, filter: "blur(25px)", y: 120 },
+                { opacity: 1, filter: "blur(0px)", y: 0, duration: 1.2, ease: "power3.out" }
+            );
+
+            // Flower parallax: Slow drift with enhanced rotation
+            if (flower) {
+                tl.to(flower, {
+                    y: -120,
+                    rotate: 20,
+                    opacity: 0.9,
+                    duration: 1.2,
+                    ease: "none"
+                }, 0);
+            }
+        });
+
+        // Background Orb Movement (Infinite loop) - Enhanced
+        gsap.to(".orb-1", {
+            x: 250,
+            y: 150,
+            rotation: 360,
+            duration: 25,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        gsap.to(".orb-2", {
+            x: -250,
+            y: -150,
+            rotation: -360,
+            duration: 30,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // SCROLL PROGRESS BAR
+        gsap.registerEffect({
+            name: "progressBar",
+            effect: (targets, config) => {
+                return gsap.to(targets, {
+                    scrollTrigger: {
+                        trigger: "body",
+                        start: "top top",
+                        end: "bottom bottom",
+                        scrub: 0.3,
+                        onUpdate: (self) => {
+                            document.getElementById('progress-bar').style.width = (self.progress * 100) + "%";
+                        }
+                    }
+                });
+            }
+        });
+
+        // Initialize progress bar
+        gsap.effects.progressBar(null);
+
+        // FLOATING ELEMENTS ANIMATION
+        function createFloatingElements() {
+            const sections = document.querySelectorAll('section');
+            const types = ['float-1', 'float-2', 'float-3'];
+            
+            sections.forEach((section, index) => {
+                const type = types[index % types.length];
+                const element = document.createElement('div');
+                element.className = `float-element ${type}`;
+                
+                const startX = Math.random() * 200 - 100;
+                const startY = Math.random() * 100 - 50;
+                
+                element.style.left = (50 + startX) + 'px';
+                element.style.top = (50 + startY) + 'px';
+                
+                section.appendChild(element);
+                
+                // Animate floating elements
+                gsap.timeline({
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 80%",
+                        end: "bottom 20%",
+                        scrub: 1
+                    }
+                })
+                .fromTo(element,
+                    { opacity: 0, y: 50 },
+                    { opacity: 1, y: -50, duration: 1, ease: "none" }
+                );
+            });
+        }
+
+        createFloatingElements();
+
+        // SECTION DIVIDERS
+        function createSectionDividers() {
+            const sections = document.querySelectorAll('section');
+            sections.forEach((section, index) => {
+                if (index < sections.length - 1) {
+                    const divider = document.createElement('div');
+                    divider.className = 'divider';
+                    section.appendChild(divider);
+                    
+                    gsap.timeline({
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "bottom 20%",
+                            end: "bottom center",
+                            scrub: 1
+                        }
+                    })
+                    .fromTo(divider,
+                        { opacity: 0 },
+                        { opacity: 1, duration: 0.5 }
+                    );
+                }
+            });
+        }
+
+        createSectionDividers();
+
+        // SPLASH SCREEN DECORATIONS ANIMATION
+        const splashDecos = document.querySelectorAll('.splash-decoration');
+        splashDecos.forEach((deco) => {
+            gsap.to(deco, {
+                rotation: deco.classList.contains('splash-decoration-1') ? 360 : -360,
+                duration: deco.classList.contains('splash-decoration-1') ? 20 : 25,
+                repeat: -1,
+                ease: "none"
+            });
+        });
+
+        // PAGE LOAD ANIMATION
+        gsap.from(".container", {
+            opacity: 0,
+            y: 100,
+            duration: 0.8,
+            delay: 1.5,
+            ease: "power3.out"
+        });
+    </script>
+</body>
+</html>
